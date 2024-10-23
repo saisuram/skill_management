@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict Next Career Steps</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">Predict Your Next Career Steps</h2>
+        <p class="text-center">Enter your job titles sequentially to get personalized career predictions.</p>
+
+        <!-- Form to Input Job Titles -->
+        <form method="POST" action="{{ url_for('predict_career_next_steps') }}">
+            <div class="form-group">
+                <label for="job_titles">Enter your job titles (sequentially):</label>
+                {% for i in range(3) %}
+                    <input type="text" name="job_titles[]" class="form-control mb-2" placeholder="Enter job title {{ i+1 }}" required>
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Predict Next Steps</button>
+        </form>
+
+        <!-- Display the Predicted Next Career Steps -->
+        {% if predicted_jobs %}
+            <div class="mt-5">
+                <h3>Predicted Next Career Steps:</h3>
+                <ul class="list-group">
+                    {% for job in predicted_jobs %}
+                        <li class="list-group-item">{{ job }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <!-- Display the Job Title Vocabulary -->
+        {% if job_title_vocab %}
+            <div class="mt-5">
+                <h4>Available Job Titles in Vocabulary:</h4>
+                <ul class="list-inline">
+                    {% for title in job_title_vocab %}
+                        <li class="list-inline-item badge badge-secondary mb-1">{{ title }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

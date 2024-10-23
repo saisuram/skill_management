@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Your Skills</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container mt-5">
+        <!-- Form to enter job description -->
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">Enter Your Job Description</h1>
+            </div>
+            <div class="card-body">
+                <form action="/set_skills" method="POST">
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Job Description:</label>
+                        <textarea id="description" name="description" class="form-control" rows="4">{{ request.form.description }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Extract Skills</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- If skills were extracted, display them in a checklist -->
+        {% if extracted_skills %}
+        <hr>
+        <div class="card mt-4">
+            <div class="card-header">
+                <h2 class="card-title">Select Skills</h2>
+            </div>
+            <div class="card-body">
+                <form action="/save_skills" method="POST">
+                    <!-- Hidden field to store extracted skills -->
+                    {% for skill in extracted_skills %}
+                    <input type="hidden" name="extracted_skills[]" value="{{ skill }}">
+                    {% endfor %}
+
+                    <div class="mb-3">
+                        <ul class="list-group">
+                            {% for skill in extracted_skills %}
+                            <li class="list-group-item">
+                                <input type="checkbox" name="selected_skills[]" value="{{ skill }}" checked>
+                                <label>{{ skill }}</label>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <!-- Option to add new skills -->
+                    <div class="mb-3">
+                        <label for="new_skill" class="form-label">Add a new skill:</label>
+                        <input type="text" id="new_skill" name="new_skill" class="form-control" placeholder="Enter new skill">
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Save and Continue to Dashboard</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-warning mt-4" role="alert">
+            No skills were extracted. Please make sure your job description is detailed enough.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS and dependencies (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

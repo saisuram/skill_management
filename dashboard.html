@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .progress {
+            height: 20px;
+        }
+        .skill-badge {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .offcanvas-header {
+            background-color: #f8f9fa;
+        }
+        .offcanvas-body {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Welcome to Your Dashboard</h1>
+
+        <!-- Button to trigger popout menu -->
+        <button class="btn btn-info" type="button" data-bs-toggle="offcanvas" data-bs-target="#interactionChanges" aria-controls="interactionChanges">
+            View Interaction Changes
+        </button>
+
+        <!-- Offcanvas Popout for Interaction Changes -->
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="interactionChanges" aria-labelledby="interactionChangesLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="interactionChangesLabel">Interaction Changes</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <h6>Jobs with Increased Interaction Scores</h6>
+                {% if increased_jobs %}
+                    <ul class="list-group mb-4">
+                        {% for job in increased_jobs %}
+                            <li class="list-group-item">
+                                <strong>{{ job.title }}</strong>
+                                <p>{{ job.description | safe }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No jobs with increased scores.</p>
+                {% endif %}
+
+                <h6>Jobs with Decreased Interaction Scores</h6>
+                {% if decreased_jobs %}
+                    <ul class="list-group">
+                        {% for job in decreased_jobs %}
+                            <li class="list-group-item">
+                                <strong>{{ job.title }}</strong>
+                                <p>{{ job.description | safe }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No jobs with decreased scores.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Main Job Cards Section -->
+        <div id="jobs" class="mt-4">
+            {% if jobs %}
+                <h2 class="mb-4">Available Jobs</h2>
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                    {% for job in jobs %}
+                        <div class="col">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ job.title }}</h5>
+                                    <p class="card-text">{{ job.description | safe }}</p>
+                                </div>
+                                <div class="card-footer">
+                                    <a href="{{ job.link }}" class="btn btn-primary" target="_blank">Apply Here</a>
+
+                                    <!-- Like/Dislike Buttons -->
+                                    <div class="mt-3">
+                                        <form method="POST" action="{{ url_for('dashboard') }}">
+                                            <input type="hidden" name="job_id" value="{{ job.id }}">
+                                            <button type="submit" name="action" value="like" class="btn btn-success">👍 Like</button>
+                                            <button type="submit" name="action" value="dislike" class="btn btn-danger">👎 Dislike</button>
+                                        </form>
+                                    </div>
+
+                                    <!-- Skill Scores with Progress Bars -->
+                                    <div class="mt-3">
+                                        <h6>Skills and Scores:</h6>
+                                        <ul class="list-group list-group-flush">
+                                            {% for skill, score in job.scores.items() %}
+                                                {% if score is number %}  <!-- Ensure that score is a number -->
+                                                    <li class="list-group-item">
+                                                        <span class="badge bg-primary skill-badge">{{ skill }}</span>
+                                                        <div class="progress">
+                                                            <div class="progress-bar {{ 'bg-success' if score * 100 >= 60 else 'bg-warning' if score * 100 >= 35 else 'bg-danger' }}"
+                                                                role="progressbar" style="width: {{ score * 100 }}%;" aria-valuenow="{{ score * 100 }}" aria-valuemin="0" aria-valuemax="100">
+                                                                {{ score * 100 | round(2) }}%
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                {% else %}
+                                                    <li class="list-group-item">Error: Invalid score for {{ skill }}</li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No more jobs to display!</p>
+            {% endif %}
+        </div>
+
+        <div class="mt-4">
+            <a href="/logout" class="btn btn-danger">Logout</a>
+            <a href="/set_skills" class="btn btn-primary">Set/Change Skills</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
